@@ -43,10 +43,6 @@ int USRead() {
     float distanceCm = duration * 0.0343/2;
 
 
-    // Prints the distance in the Serial Monitor
-    Serial.print("Distance (cm): ");
-    Serial.println(distanceCm);
-    delay(500);
     return distanceCm;
 }
 
