@@ -7,6 +7,9 @@
 const char* AP_SSID = "GROEP_6_PROJECT_2";
 const char* AP_PASSWORD = "KGADW&^54AWDKJ&R^";
 
+#define US1EchoPin 19
+#define US1TriggerPin 18
+
 WiFiServer server(80);
 String header;
 
@@ -24,10 +27,32 @@ void readMacAddress() {
     }
 }
 
+int USRead() {
+    // Clears the trigPin
+    digitalWrite(US1TriggerPin, LOW);
+    delayMicroseconds(2);
+    // Sets the trigPin on HIGH state for 10 micro seconds
+    digitalWrite(US1TriggerPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(US1TriggerPin, LOW);
+
+    // Reads the echoPin, returns the sound wave travel time in microseconds
+    float duration = pulseIn(US1EchoPin, HIGH);
+
+    // Calculate the distance
+    float distanceCm = duration * 0.0343/2;
+
+
+    return distanceCm;
+}
+
 void setup() {
     Serial.begin(9600);
     // Serial.println("Mac Address:");
     // readMacAddress();
+
+    pinMode(US1TriggerPin, OUTPUT);
+    pinMode(US1EchoPin , INPUT);
 
     if (!SPIFFS.begin()) {
         Serial.println("An error occured while mounting SPIFFS, aborting!");
@@ -42,8 +67,8 @@ void setup() {
 }
 
 void loop() {
+    USRead();
     WiFiClient client = server.available();
-
     if (client) {
         Serial.println("HTTP Client Connected");
         while (client.connected()) {
