@@ -19,7 +19,7 @@
 #define EnableR2 22 //Enable Motor 2 R
 
 
-void setup(){
+void motorSetup(){
     pinMode(MotorInL1V, OUTPUT);
     pinMode(MotorInL1A, OUTPUT);
     pinMode(MotorInL2V, OUTPUT);
