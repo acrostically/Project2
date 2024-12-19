@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Data Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: white;
+            background-color: #121212;
+        }
+        p {
+            font-size: 1.2em;
+        }
+        div {
+            margin: 20px auto;
+        }
+
+        #grid {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .grid-item {
+            width: 45%;
+            min-width: 300px;
+            margin: auto;
+            border: 1px solid black;
+            border-radius: 15px;
+            padding: 1em;
+            background-color: #222222;
+        }
+    </style>
+</head>
+<body>
+<h1>Live Data Stream</h1>
+<p>Status: <span id="status">Connecting...</span></p>
+<div style="display: flex; justify-content: space-around; margin: 0;">
+    <p>Current Direction: <span id="DIRECTION">Loading...</span></p>
+    <p>Left IR: <span id="LeftIR">Loading...</span></p>
+    <p>Right IR: <span id="RightIR">Loading...</span></p>
+    <p>TIMESTAMP: <span id="stamp">Loading...</span></p>
+    <p>US Down: <span id="USDown">Loading...</span></p>
+    <p>US Forward: <span id="USForward">Loading...</span></p>
+</div>
+
+<script>
+    function feedLoader(id, value, trigger) {
+        let element = document.getElementById(id);
+        if (id === "DIRECTION") {
+            if (value !== "STOP") {
+                element.innerText = value === "FORWARD" ? "FORWARD" : "BACKWARD";
+                element.style.color = value === "FORWARD" ? "GREEN" : "ORANGE";
+            } else {
+                element.innerText = "STOP";
+                element.style.color = "RED";
+            }
+            return;
+        }
+        let state = value < trigger;
+        element.innerText = state ? "DETECTING" : "CLEAR";
+        element.style.color = state ? "RED" : "GREEN";
+    }
+
+    const eventSource = new EventSource('/events');
+
+    eventSource.addEventListener("open", (event) => {
+        document.getElementById("status").innerText = "Connected!";
+    });
+
+    eventSource.addEventListener("IRLeft", (event) => {
+        console.log("Left IR: " + event.data);
+        feedLoader("LeftIR", parseInt(event.data), 100);
+    });
+    eventSource.addEventListener("IRRight", (event) => {
+        console.log("Right IR: " + event.data);
+        const x = document.getElementById("stamp");
+        x.innerText = Date.now();
+        feedLoader("RightIR", parseInt(event.data), 100);
+    });
+
+    eventSource.addEventListener("USDown", (event) => {
+        console.log("US Down: " + event.data);
+        feedLoader("USDown", parseInt(event.data), 100);
+    });
+    eventSource.addEventListener("USForward", (event) => {
+        console.log("US Forward: " + event.data);
+        feedLoader("USForward", parseInt(event.data), 100);
+    });
+
+    eventSource.addEventListener("DIRECTION", (event) => {
+        console.log("DIRECTION: " + event.data);
+        feedLoader("DIRECTION", event.data);
+    });
+
+    eventSource.onerror = function(error) {
+        console.error(error);
+        document.getElementById("status").innerText = "Failed to connect to server. Please reload the page!";
+        eventSource.close(); // Optionally close the connection on error
+    };
+</script>
+
+</body>
+</html>
