@@ -66,6 +66,8 @@ void eventPulse();
 TaskHandle_t eventPulseTask;
 SemaphoreHandle_t dataMutex;
 
+bool enabled = false;
+
 void setup() {
     Serial.begin(9600);
 
@@ -96,13 +98,21 @@ void setup() {
         request->send(SPIFFS, "/index.html", String(), false);
     });
 
+    server.on("/toggle", HTTP_POST, [](AsyncWebServerRequest *request) {
+        enabled = !enabled;
+        Serial.print("ACM is now ");
+        Serial.println(enabled ? "ENABLED" : "DISABLED");
+
+        request->send(200, "text/plain", enabled ? "true" : "false");
+    });
+
     // event handling
     events.onConnect([](const AsyncEventSourceClient *client) {
         if (client->lastId()) {
             Serial.println("Client reconnected! Last message ID: " + String(client->lastId()));
         } else {
             Serial.println("New client connected!");
-            events.send("connected", "open", millis());
+            events.send(String(enabled).c_str(), "open", millis());
         }
     });
     server.addHandler(&events);
@@ -125,6 +135,8 @@ void setup() {
 }
 
 void loop() {
+    if (!enabled) return;
+
     xSemaphoreTake(dataMutex, portMAX_DELAY);
     USDownData = USRead(USDownTriggerPin, USDownEchoPin);
     USForwardData = USRead(USForwardTriggerPin, USForwardEchoPin);
@@ -141,7 +153,6 @@ void loop() {
 }
 
 void eventPulse() {
-    unsigned long x = millis();
     for (;;) {
         if (millis() - lastPulseMS >= pulseDelay) {
             xSemaphoreTake(dataMutex, portMAX_DELAY);
@@ -151,18 +162,19 @@ void eventPulse() {
             const int localUSForwardData = USForwardData;
             xSemaphoreGive(dataMutex);
 
-            events.send(String(localIRLeftData).c_str(), "IRLeft", millis(), pulseDelay);
-            if (millis() - x > pulseDelay) {
-                events.send(String(localIRRightData).c_str(), "IRRight", millis(), pulseDelay);
-            }
-            if (localUSDownData != -1) events.send(String(localUSDownData).c_str(), "USDown", millis(), pulseDelay);
-            else events.send("N/A", "USDown", millis(), pulseDelay);
-            if (localUSForwardData != -1) events.send(String(localUSForwardData).c_str(), "USForward", millis(), pulseDelay);
-            else events.send("N/A", "USDown", millis(), pulseDelay);
-            events.send(getMotorDirectionString().c_str(), "DIRECTION", millis(), pulseDelay);
+            String JSON = "{";
+            JSON += "\"IRLeftData\":" + String(localIRLeftData) + ",";
+            JSON += "\"IRRightData\":" + String(localIRRightData) + ",";
+            JSON += "\"USDownData\":" + String(localUSDownData) + ",";
+            JSON += "\"USForwardData\":" + String(localUSForwardData) + ",";
+            JSON += "\"direction\": \"" + getMotorDirectionString() + "\"";
+            JSON += "}";
+
+            events.send(JSON.c_str(), "pulse", millis());
+
             lastPulseMS = millis();
         }
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 

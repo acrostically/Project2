@@ -18,38 +18,115 @@
             margin: 20px auto;
         }
 
-        #grid {
+        .grid {
             display: flex;
-            flex-wrap: wrap;
+            justify-content: space-around;
+            margin: 0;
+            flex-direction: column
         }
 
-        .grid-item {
-            width: 45%;
-            min-width: 300px;
-            margin: auto;
-            border: 1px solid black;
-            border-radius: 15px;
-            padding: 1em;
-            background-color: #222222;
+        .grid-row {
+            width: 50%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
         }
     </style>
 </head>
 <body>
-<h1>Live Data Stream</h1>
-<p>Status: <span id="status">Connecting...</span></p>
-<div style="display: flex; justify-content: space-around; margin: 0;">
+<h1>ACM Dashboard</h1>
+
+<div style="display: flex; flex-direction: row; justify-content: center; gap: 5rem">
+    <p id="status" style="padding:0.5rem;">Loading...</p>
+    <p style="cursor: pointer; border: 1px solid white; border-radius: 25px; padding:0.5rem;" onclick="toggleACM()">Toggle!</p>
+</div>
+<p>Connection: <span id="connection">Connecting...</span></p>
+<p>Last Update: <span id="stamp" style="font-family: monospace"></span>s ago!</p>
+
+<svg
+        viewBox="0 0 377.85317 229.50658"
+        width="377.85318"
+        height="229.50658"
+        xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="DistanceX" orient="auto" refX="0" refY="0" style="overflow:visible">
+            <path d="M 3,-3 -3,3 M 0,-5 V 5" style="stroke:#FFFFFF;stroke-width:0.5" />
+        </marker>
+        <pattern id="Hatch" patternUnits="userSpaceOnUse" width="8" height="8">
+            <path d="M8 4 l-4,4" stroke="#FFFFFF" stroke-width="0.25" linecap="square" />
+            <path d="M6 2 l-4,4" stroke="#FFFFFF" stroke-width="0.25" linecap="square" />
+            <path d="M4 0 l-4,4" stroke="#FFFFFF" stroke-width="0.25" linecap="square" />
+        </pattern>
+    </defs>
+    <g transform="translate(-0.00017668217,0.0020685)">
+        <path
+                style="fill:none;stroke:#FFFFFF"
+                d="M 169.68164,1.2539062 C 104.83124,6.3482643 44.646079,36.946544 2.3183594,86.341797 -1.8843582,91.244808 1.5989048,98.819541 8.0566406,98.820312 H 67.982422 c 4.174392,2.55e-4 7.558342,3.384208 7.558594,7.558598 v 122.62304 c 0,0 227.541574,-1.16298 226.771484,-1.51759 V 106.37891 c 2.5e-4,-4.17439 3.3842,-7.558341 7.55859,-7.558598 h 59.92383 c 6.45866,9.03e-4 9.94356,-7.574805 5.74024,-12.478515 C 324.44841,26.725068 247.95176,-4.8942038 169.68164,1.2539062 Z" />
+        <rect
+                id="MiddleIRSVG"
+                style="fill:none;stroke:#FFFFFF;stroke-opacity:1"
+                width="63.965343"
+                height="18.756756"
+                x="154.81738"
+                y="14.429317" />
+        <rect
+                id="RightIRSVG"
+                style="fill:none;stroke:#FFFFFF;stroke-opacity:1"
+                width="63.965343"
+                height="18.756756"
+                x="258.32397"
+                y="-119.12699"
+                transform="rotate(30.448873)" />
+        <rect
+                id="LeftIRSVG"
+                style="fill:none;stroke:#FFFFFF;stroke-opacity:1"
+                width="63.965343"
+                height="18.756756"
+                x="-68.581749"
+                y="72.428772"
+                transform="matrix(-0.86208171,0.5067693,0.5067693,0.86208171,0,0)" />
+        <rect
+                id="USForwardSVG"
+                style="fill:none;stroke:#FFFFFF;stroke-opacity:1"
+                width="138.51143"
+                height="46.651417"
+                x="118.31184"
+                y="62.522514" />
+        <rect
+                id="USDownSVG"
+                style="fill:none;stroke:#FFFFFF;stroke-opacity:1"
+                width="138.51143"
+                height="46.651417"
+                x="119.01005"
+                y="140.18953" />
+    </g>
+</svg>
+
+
+<div class="grid">
     <p>Current Direction: <span id="DIRECTION">Loading...</span></p>
-    <p>Left IR: <span id="LeftIR">Loading...</span></p>
-    <p>Right IR: <span id="RightIR">Loading...</span></p>
-    <p>TIMESTAMP: <span id="stamp">Loading...</span></p>
-    <p>US Down: <span id="USDown">Loading...</span></p>
-    <p>US Forward: <span id="USForward">Loading...</span></p>
+
+    <div class="grid-row">
+        <p>Left IR: <span id="LeftIR">Loading...</span></p>
+        <p>Right IR: <span id="RightIR">Loading...</span></p>
+    </div>
+    <div class="grid-row">
+        <p>US Down: <span id="USDown">Loading...</span></p>
+        <p>US Forward: <span id="USForward">Loading...</span></p>
+    </div>
 </div>
 
 <script>
+    let lastUpdate = Date.now();
+    let stampDom = document.getElementById("stamp");
+
+    function toggleACM() {
+        fetch('/toggle', { method: 'POST' } ).then(res => res.text()).then(data => statusLoader(data));
+    }
+
     function feedLoader(id, value, trigger) {
-        let element = document.getElementById(id);
         if (id === "DIRECTION") {
+            let element = document.getElementById(id);
             if (value !== "STOP") {
                 element.innerText = value === "FORWARD" ? "FORWARD" : "BACKWARD";
                 element.style.color = value === "FORWARD" ? "GREEN" : "ORANGE";
@@ -59,46 +136,47 @@
             }
             return;
         }
-        let state = value < trigger;
-        element.innerText = state ? "DETECTING" : "CLEAR";
-        element.style.color = state ? "RED" : "GREEN";
+        let element = document.getElementById(id+"SVG");
+        element.style.fill = value < trigger ? "red" : "green";
+        // let state = value < trigger;
+        // element.innerText = state ? "DETECTING" : "CLEAR";
+        // element.style.color = state ? "RED" : "GREEN";
+    }
+
+    setInterval(() => {
+        stampDom.innerText = `${((Date.now() - lastUpdate) / 1000).toFixed(1)}`
+    }, 100);
+
+    function statusLoader(value) {
+        console.log(value);
+        let element = document.getElementById("status");
+        let enabled = value === "true";
+        element.innerText = enabled ? "ENABLED" : "OFF";
+        element.style.color = enabled ? "GREEN" : "RED";
     }
 
     const eventSource = new EventSource('/events');
 
     eventSource.addEventListener("open", (event) => {
-        document.getElementById("status").innerText = "Connected!";
+        console.log("SSE Connected Successfully!");
+        document.getElementById("connection").innerText = "Connected!";
+        statusLoader(event.data);
     });
 
-    eventSource.addEventListener("IRLeft", (event) => {
-        console.log("Left IR: " + event.data);
-        feedLoader("LeftIR", parseInt(event.data), 100);
-    });
-    eventSource.addEventListener("IRRight", (event) => {
-        console.log("Right IR: " + event.data);
-        const x = document.getElementById("stamp");
-        x.innerText = Date.now();
-        feedLoader("RightIR", parseInt(event.data), 100);
-    });
-
-    eventSource.addEventListener("USDown", (event) => {
-        console.log("US Down: " + event.data);
-        feedLoader("USDown", parseInt(event.data), 100);
-    });
-    eventSource.addEventListener("USForward", (event) => {
-        console.log("US Forward: " + event.data);
-        feedLoader("USForward", parseInt(event.data), 100);
-    });
-
-    eventSource.addEventListener("DIRECTION", (event) => {
-        console.log("DIRECTION: " + event.data);
-        feedLoader("DIRECTION", event.data);
+    eventSource.addEventListener("pulse", (event) => {
+        let json = JSON.parse(event.data);
+        feedLoader("LeftIR", parseInt(json.IRLeftData), 100);
+        feedLoader("RightIR", parseInt(json.IRRightData), 100);
+        feedLoader("USDown", parseInt(json.USDownData), 100);
+        feedLoader("USForward", parseInt(json.USForwardData), 100);
+        feedLoader("DIRECTION", json.direction);
+        lastUpdate = Date.now();
     });
 
     eventSource.onerror = function(error) {
         console.error(error);
-        document.getElementById("status").innerText = "Failed to connect to server. Please reload the page!";
-        eventSource.close(); // Optionally close the connection on error
+        document.getElementById("connection").innerText = "Failed to connect to server. Please reload the page!";
+        eventSource.close();
     };
 </script>
 
