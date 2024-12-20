@@ -4,6 +4,7 @@
 #include <SPIFFS.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include "Motor.h"
 
 // Connection Data for ESP
 const char* AP_SSID = "GROEP_6_PROJECT_2";
@@ -195,4 +196,8 @@ String getMotorDirectionString() {
         default:
             return "UNKNOWN";
     }
+
+    gaVooruit();
+
+    
 }
