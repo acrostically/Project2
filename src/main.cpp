@@ -19,7 +19,7 @@ constexpr int IRLeftPin = 16;
 constexpr int IRBackPin = 4;
 constexpr int IRRightPin = 0;
 
-constexpr int detectTreshold = 5; // in cm
+constexpr int detectThreshold = 5; // in cm
 
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
@@ -33,26 +33,14 @@ Direction carDirection = Direction::STOP;
 
 // event update frequency in MS for UI
 unsigned long lastPulseMS = 0;
-const int pulseDelay = 500;
+constexpr int pulseDelay = 500;
 
 int IRLeftData;
 int IRRightData;
 int USDownData;
 int USForwardData;
 
-void readMacAddress() {
-    uint8_t baseMac[6];
-    esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, baseMac);
-    if (ret == ESP_OK) {
-        Serial.printf("%02X:%02X:%02X:%02X:%02X:%02X\n",
-                      baseMac[0], baseMac[1], baseMac[2],
-                      baseMac[3], baseMac[4], baseMac[5]);
-    } else {
-        Serial.println("Failed to read MAC address");
-    }
-}
-
-int USRead(int TrigPin, int EchoPin) {
+int USRead(const int TrigPin, const int EchoPin) {
     // Clears the trigPin
     digitalWrite(TrigPin, LOW);
     delayMicroseconds(2);
@@ -62,17 +50,14 @@ int USRead(int TrigPin, int EchoPin) {
     digitalWrite(TrigPin, LOW);
 
     // Reads the echoPin, returns the sound wave travel time in microseconds
-    float duration = pulseIn(EchoPin, HIGH, 30000);
+    const unsigned long duration = pulseIn(EchoPin, HIGH, 30000);
 
     if (duration == 0) {
         return -1;
     }
 
-    // Calculate the distance
-    float distanceCm = duration * 0.0343/2;
-
-
-    return distanceCm;
+    // return distance in CM
+    return (duration * 0.0343 / 2);
 }
 
 String getMotorDirectionString();
@@ -81,18 +66,15 @@ void eventPulse();
 TaskHandle_t eventPulseTask;
 SemaphoreHandle_t dataMutex;
 
-
 void setup() {
     Serial.begin(9600);
-    // Serial.println("Mac Address:");
-    // readMacAddress();
 
     dataMutex = xSemaphoreCreateMutex();
-    if (dataMutex == NULL) {
+    if (dataMutex == nullptr) {
         Serial.println("Failed to create mutex!");
-    } else {
-        Serial.println("Mutex created successfully.");
+        return;
     }
+    Serial.println("Mutex created successfully.");
 
     pinMode(USForwardTriggerPin, OUTPUT);
     pinMode(USForwardEchoPin , INPUT);
@@ -103,17 +85,19 @@ void setup() {
         Serial.println("An error occured while mounting SPIFFS, aborting!");
         return;
     }
+    Serial.println("SPIFFS initialized successfully.");
 
     WiFi.softAP(AP_SSID, AP_PASSWORD);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.softAPIP());
+    Serial.println("AccessPoint initialized succesfully!");
+    Serial.println("AP SSID: " + String(AP_SSID));
+    Serial.println("AP PASSWORD: " + String(AP_PASSWORD));
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html", String(), false);
     });
 
     // event handling
-    events.onConnect([](AsyncEventSourceClient *client) {
+    events.onConnect([](const AsyncEventSourceClient *client) {
         if (client->lastId()) {
             Serial.println("Client reconnected! Last message ID: " + String(client->lastId()));
         } else {
@@ -123,8 +107,10 @@ void setup() {
     });
     server.addHandler(&events);
     server.begin();
+    Serial.print("HTTP server started! Load dashboard on ");
+    Serial.println(WiFi.softAPIP());
 
-    // setup event source handler on seperate core
+    // setup event source handler on separate core
     xTaskCreatePinnedToCore(
         reinterpret_cast<TaskFunction_t>(eventPulse),
         "EventPulse",
@@ -133,20 +119,20 @@ void setup() {
         1,
         &eventPulseTask,
         0);
+    Serial.println("Server Sent Events loaded on core 0!");
+
+    Serial.println("Starting main loop!\n");
 }
 
 void loop() {
-    Serial.println("Loop attempting to take mutex...");
     xSemaphoreTake(dataMutex, portMAX_DELAY);
-    Serial.println("Loop acquired mutex!");
     USDownData = USRead(USDownTriggerPin, USDownEchoPin);
     USForwardData = USRead(USForwardTriggerPin, USForwardEchoPin);
     IRLeftData = digitalRead(IRLeftPin);
     IRRightData = digitalRead(IRRightPin);
     xSemaphoreGive(dataMutex);
-    Serial.println("Loop released mutex!");
 
-    bool shouldCorrect = USForwardData < detectTreshold;
+    bool shouldCorrect = USForwardData < detectThreshold;
     if (shouldCorrect) {
         // if (IRLeftData)
     }
@@ -157,19 +143,14 @@ void loop() {
 void eventPulse() {
     unsigned long x = millis();
     for (;;) {
-        Serial.println("Event pulse is alive");
         if (millis() - lastPulseMS >= pulseDelay) {
-            Serial.println("Event pulse attempting to take mutex...");
             xSemaphoreTake(dataMutex, portMAX_DELAY);
-            Serial.println("Event pulse acquired mutex!");
             const int localIRLeftData = IRLeftData;
             const int localIRRightData = IRRightData;
             const int localUSDownData = USDownData;
             const int localUSForwardData = USForwardData;
             xSemaphoreGive(dataMutex);
-            Serial.println("Event pulse released mutex!");
 
-            Serial.println("Event pulse attempting to send data");
             events.send(String(localIRLeftData).c_str(), "IRLeft", millis(), pulseDelay);
             if (millis() - x > pulseDelay) {
                 events.send(String(localIRRightData).c_str(), "IRRight", millis(), pulseDelay);
@@ -196,8 +177,4 @@ String getMotorDirectionString() {
         default:
             return "UNKNOWN";
     }
-
-    gaVooruit();
-
-    
 }
