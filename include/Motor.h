@@ -1,11 +1,11 @@
-#ifndef Motor_H   
-#define Motor_H   
+#ifndef Motor_H
+#define Motor_H
 
 #include <Arduino.h>
 
-#define MotorInL1V 34 //Motor 1 L Voor
-#define MotorInL1A 35 //Motor 1 L Achteruit
-#define MotorInL2V 32//Motor 2 L Voor
+#define MotorInL1V 32 //Motor 1 L Voor
+#define MotorInL1A 33 //Motor 1 L Achteruit
+#define MotorInL2V 25//Motor 2 L Voor
 #define MotorInL2A 33 //Motor 2 L Achteruit
 
 #define MotorInR1V 25 //Motor 1 R Voor
@@ -36,28 +36,28 @@ void motorSetup(){
 }
 
 void gaVooruit() {
-
-    //Enable pins
-    digitalWrite(EnableL1, HIGH);
-    digitalWrite (EnableL2, HIGH);
-    digitalWrite (EnableR1, HIGH);
-    digitalWrite (EnableR2, HIGH);
-
+    //
+    // //Enable pins
+    // digitalWrite(EnableL1, HIGH);
+    // digitalWrite (EnableL2, HIGH);
+    // digitalWrite (EnableR1, HIGH);
+    // digitalWrite (EnableR2, HIGH);
+    //
     //Motor pins vooruit
     digitalWrite(MotorInL1V, HIGH);
     digitalWrite(MotorInL2V, HIGH);
     digitalWrite(MotorInR1V, HIGH);
     digitalWrite(MotorInR2V, HIGH);
-
-    //Motor pins achteruit
-    digitalWrite(MotorInL1A, LOW);
-    digitalWrite(MotorInR1A, LOW);
-    digitalWrite(MotorInL2A, LOW);
-    digitalWrite(MotorInR2A, LOW);
+    //
+    // //Motor pins achteruit
+    // digitalWrite(MotorInL1A, LOW);
+    // digitalWrite(MotorInR1A, LOW);
+    // digitalWrite(MotorInL2A, LOW);
+    // digitalWrite(MotorInR2A, LOW);
 }
 
 void gaAchteruit(){
-    
+
     digitalWrite (EnableL1, HIGH);
     digitalWrite (EnableL2, HIGH);
     digitalWrite (EnableR1, HIGH);
@@ -73,47 +73,47 @@ void gaAchteruit(){
     digitalWrite(MotorInL1A, HIGH);
     digitalWrite(MotorInR1A, HIGH);
     digitalWrite(MotorInL2A, HIGH);
-    digitalWrite(MotorInR2A, HIGH); 
+    digitalWrite(MotorInR2A, HIGH);
 }
 
 void gaLinks(){
-    
-    digitalWrite (EnableL1, HIGH);
-    digitalWrite (EnableL2, HIGH);
-    digitalWrite (EnableR1, HIGH);
-    digitalWrite (EnableR2, HIGH);
-
-    //Motor pins vooruit
-    digitalWrite(MotorInL1V, LOW);
-    digitalWrite(MotorInL2V, LOW);
-    digitalWrite(MotorInR1V, HIGH);
-    digitalWrite(MotorInR2V, HIGH);
-
-    //Motor pins achteruit
-    digitalWrite(MotorInL1A, HIGH);
-    digitalWrite(MotorInR1A, HIGH);
-    digitalWrite(MotorInL2A, LOW);
-    digitalWrite(MotorInR2A, LOW); 
+    //
+    // digitalWrite (EnableL1, HIGH);
+    // digitalWrite (EnableL2, HIGH);
+    // digitalWrite (EnableR1, HIGH);
+    // digitalWrite (EnableR2, HIGH);
+    //
+    // //Motor pins vooruit
+    // digitalWrite(MotorInL1V, LOW);
+    // digitalWrite(MotorInL2V, LOW);
+    // digitalWrite(MotorInR1V, HIGH);
+    // digitalWrite(MotorInR2V, HIGH);
+    //
+    // //Motor pins achteruit
+    // digitalWrite(MotorInL1A, HIGH);
+    // digitalWrite(MotorInR1A, HIGH);
+    // digitalWrite(MotorInL2A, LOW);
+    // digitalWrite(MotorInR2A, LOW);
 }
 
 void gaRechts(){
-    
-    digitalWrite (EnableL1, HIGH);
-    digitalWrite (EnableL2, HIGH);
-    digitalWrite (EnableR1, HIGH);
-    digitalWrite (EnableR2, HIGH);
 
-    //Motor pins vooruit
-    digitalWrite(MotorInL1V, HIGH);
-    digitalWrite(MotorInL2V, HIGH);
-    digitalWrite(MotorInR1V, LOW);
-    digitalWrite(MotorInR2V, LOW);
-
-    //Motor pins achteruit
-    digitalWrite(MotorInL1A, LOW);
-    digitalWrite(MotorInR1A, LOW);
-    digitalWrite(MotorInL2A, HIGH);
-    digitalWrite(MotorInR2A, HIGH); 
+    // digitalWrite (EnableL1, HIGH);
+    // digitalWrite (EnableL2, HIGH);
+    // digitalWrite (EnableR1, HIGH);
+    // digitalWrite (EnableR2, HIGH);
+    //
+    // //Motor pins vooruit
+    // digitalWrite(MotorInL1V, HIGH);
+    // digitalWrite(MotorInL2V, HIGH);
+    // digitalWrite(MotorInR1V, LOW);
+    // digitalWrite(MotorInR2V, LOW);
+    //
+    // //Motor pins achteruit
+    // digitalWrite(MotorInL1A, LOW);
+    // digitalWrite(MotorInR1A, LOW);
+    // digitalWrite(MotorInL2A, HIGH);
+    // digitalWrite(MotorInR2A, HIGH);
 }
 
 #endif

@@ -36,14 +36,24 @@
 </head>
 <body>
 <h1>Live Data Stream</h1>
-<p>Status: <span id="status">Connecting...</span></p>
-<div style="display: flex; justify-content: space-around; margin: 0;">
-    <p>Current Direction: <span id="DIRECTION">Loading...</span></p>
-    <p>Left IR: <span id="LeftIR">Loading...</span></p>
-    <p>Right IR: <span id="RightIR">Loading...</span></p>
+<div style="display:flex; flex-direction: column">
+    <div style="display: flex; justify-content: space-around; margin: 0;">
+        <p>on/off: <span id="onOrOff">Connecting...</span></p>
+        <p><u>toggle!</u></p>
+    </div>
+    <div style="display: flex; justify-content: space-around; margin: 0;">
+        <p>Status: <span id="status">Connecting...</span></p>
+        <p>Direction: <span id="DIRECTION">Loading...</span></p>
+    </div>
+    <div style="display: flex; justify-content: space-around; margin: 0;">
+        <p>Left IR: <span id="LeftIR">Loading...</span></p>
+        <p>Right IR: <span id="RightIR">Loading...</span></p>
+    </div>
+    <div style="display: flex; justify-content: space-around; margin: 0;">
+        <p>US Down: <span id="USDown">Loading...</span></p>
+        <p>US Forward: <span id="USForward">Loading...</span></p>
+    </div>
     <p>TIMESTAMP: <span id="stamp">Loading...</span></p>
-    <p>US Down: <span id="USDown">Loading...</span></p>
-    <p>US Forward: <span id="USForward">Loading...</span></p>
 </div>
 
 <script>
