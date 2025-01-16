@@ -5,18 +5,18 @@
 
 #define MotorInL1V 32 //Motor 1 L Voor
 #define MotorInL1A 33 //Motor 1 L Achteruit
-#define MotorInL2V 25//Motor 2 L Voor
-#define MotorInL2A 33 //Motor 2 L Achteruit
+#define MotorInL2V 27//Motor 2 L Voor
+#define MotorInL2A 14 //Motor 2 L Achteruit
 
 #define MotorInR1V 25 //Motor 1 R Voor
 #define MotorInR1A 26 //Motor 1 R Achteruit
-#define MotorInR2V 27 //Motor 2 R Voor
-#define MotorInR2A 14 //Motor 2 R Achteruit
+#define MotorInR2V 12 //Motor 2 R Voor
+#define MotorInR2A 13 //Motor 2 R Achteruit
 
-#define EnableL1 12 //Enable Motor 1 L
-#define EnableL2 13 //Enable Motor 2 L
-#define EnableR1 23 //Enable Motor 1 R
-#define EnableR2 22 //Enable Motor 2 R
+// #define EnableL1 1 //Enable Motor 1 L
+// #define EnableL2 2//Enable Motor 2 L
+// #define EnableR1  //Enable Motor 1 R
+// #define EnableR2  //Enable Motor 2 R
 
 
 void motorSetup(){
