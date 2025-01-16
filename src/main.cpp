@@ -5,19 +5,11 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "Motor.h"
+#include "Sensoren.h"
 
 // Connection Data for ESP
 const char* AP_SSID = "GROEP_6_PROJECT_2";
 const char* AP_PASSWORD = "KGADW&^54AWDKJ&R^";
-
-constexpr int USForwardEchoPin = 17;
-constexpr int USForwardTriggerPin = 5;
-constexpr int USDownEchoPin = 19;
-constexpr int USDownTriggerPin = 18;
-
-constexpr int IRLeftPin = 16;
-constexpr int IRBackPin = 4;
-constexpr int IRRightPin = 0;
 
 constexpr int detectThreshold = 5; // in cm
 
@@ -27,6 +19,8 @@ AsyncEventSource events("/events");
 enum class Direction {
     FORWARD,
     BACKWARD,
+    LEFT,
+    RIGHT,
     STOP
 };
 Direction carDirection = Direction::STOP;
@@ -35,30 +29,11 @@ Direction carDirection = Direction::STOP;
 unsigned long lastPulseMS = 0;
 constexpr int pulseDelay = 500;
 
-int IRLeftData;
-int IRRightData;
-int USDownData;
-int USForwardData;
+int IRData;
+int USData;
 
-int USRead(const int TrigPin, const int EchoPin) {
-    // Clears the trigPin
-    digitalWrite(TrigPin, LOW);
-    delayMicroseconds(2);
-    // Sets the trigPin on HIGH state for 10 micro seconds
-    digitalWrite(TrigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(TrigPin, LOW);
 
-    // Reads the echoPin, returns the sound wave travel time in microseconds
-    const unsigned long duration = pulseIn(EchoPin, HIGH, 30000);
-
-    if (duration == 0) {
-        return -1;
-    }
-
-    // return distance in CM
-    return (duration * 0.0343 / 2);
-}
+unsigned long lastMS = 0;
 
 String getMotorDirectionString();
 void eventPulse();
@@ -124,21 +99,81 @@ void setup() {
     Serial.println("Starting main loop!\n");
 }
 
+unsigned long correctionStartTime = 0;
+constexpr unsigned long reverseDuration = 500;  // Move backward for 500ms
+bool forwardDetectCache = false;
+bool isCorrecting = false;
+Direction lastCorrection = Direction::RIGHT; // don't know why we load this with right, it just felt... right
+
 void loop() {
     xSemaphoreTake(dataMutex, portMAX_DELAY);
-    USDownData = USRead(USDownTriggerPin, USDownEchoPin);
-    USForwardData = USRead(USForwardTriggerPin, USForwardEchoPin);
-    IRLeftData = digitalRead(IRLeftPin);
-    IRRightData = digitalRead(IRRightPin);
+    USData = USRead(5);
+    IRData = IRRead();
     xSemaphoreGive(dataMutex);
 
-    bool shouldCorrect = USForwardData < detectThreshold;
-    if (shouldCorrect) {
-        // if (IRLeftData)
+
+    // ALWAYS stop ASAP if we detect something in front of us, DO NOT DELAY this check
+    if ((USData != 0b00 || (IRData & 0b11)) && !forwardDetectCache) {
+        carDirection = Direction::BACKWARD;
+        gaAchteruit();
+        forwardDetectCache = true;
+        isCorrecting = true;
+        correctionStartTime = millis();
+
+        return;
     }
 
-    gaAchteruit();
-    Serial.println("Good luck!");
+    if (isCorrecting) {
+        if (millis() - correctionStartTime >= reverseDuration) {
+            isCorrecting = false;  // Done reversing, move to correction
+        } else {
+            return;  // Keep reversing until time is up
+        }
+    }
+
+    // if we detect something in front of us, we should correct
+    if (forwardDetectCache) {
+        switch (lastCorrection) { // we should always correct in the opposite direction we last corrected to prevent getting stuck
+            case Direction::LEFT:
+                carDirection = Direction::RIGHT;
+                gaRechts();
+                lastCorrection = Direction::RIGHT;
+                break;
+            case Direction::RIGHT:
+                carDirection = Direction::LEFT;
+                gaLinks();
+                lastCorrection = Direction::LEFT;
+                break;
+            default: break;
+        }
+        isCorrecting = true;
+        correctionStartTime = millis();
+        forwardDetectCache = false;
+    }
+
+    // if we detect something on the left, we should go right
+    else if ((IRData & 0b10) && carDirection != Direction::LEFT) {
+        carDirection = Direction::RIGHT;
+        gaRechts();
+        isCorrecting = true;
+        correctionStartTime = millis();
+    }
+
+    // if we detect something on the right, we should go left
+    else if ((IRData & 0b01) && carDirection != Direction::RIGHT) {
+        carDirection = Direction::LEFT;
+        gaLinks();
+        isCorrecting = true;
+        correctionStartTime = millis();
+    }
+
+    // if we're not going forward and not detecting anything, we should go forward
+    else if (carDirection != Direction::FORWARD) {
+        carDirection = Direction::FORWARD;
+        gaVooruit();
+        isCorrecting = true;
+        correctionStartTime = millis();
+    };
 }
 
 void eventPulse() {
@@ -146,24 +181,19 @@ void eventPulse() {
     for (;;) {
         if (millis() - lastPulseMS >= pulseDelay) {
             xSemaphoreTake(dataMutex, portMAX_DELAY);
-            const int localIRLeftData = IRLeftData;
-            const int localIRRightData = IRRightData;
-            const int localUSDownData = USDownData;
-            const int localUSForwardData = USForwardData;
+            const int localIRData = IRData;
+            const int localUSData = USData;
             xSemaphoreGive(dataMutex);
 
-            events.send(String(localIRLeftData).c_str(), "IRLeft", millis(), pulseDelay);
-            if (millis() - x > pulseDelay) {
-                events.send(String(localIRRightData).c_str(), "IRRight", millis(), pulseDelay);
-            }
-            if (localUSDownData != -1) events.send(String(localUSDownData).c_str(), "USDown", millis(), pulseDelay);
-            else events.send("N/A", "USDown", millis(), pulseDelay);
-            if (localUSForwardData != -1) events.send(String(localUSForwardData).c_str(), "USForward", millis(), pulseDelay);
-            else events.send("N/A", "USDown", millis(), pulseDelay);
-            events.send(getMotorDirectionString().c_str(), "DIRECTION", millis(), pulseDelay);
+            String JSON = "{";
+            JSON += "IRData: " + String(localIRData) + ",";
+            JSON += "USData: " + String(localUSData) + ",";
+            JSON += "Direction: " + getMotorDirectionString();
+            JSON += "}";
+
+            events.send(JSON.c_str(), "pulse", millis(), pulseDelay);
             lastPulseMS = millis();
         }
-        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

@@ -69,9 +69,18 @@
             }
             return;
         }
-        let state = value < trigger;
-        element.innerText = state ? "DETECTING" : "CLEAR";
-        element.style.color = state ? "RED" : "GREEN";
+        if (id === "IRData") {
+            let leftIRState = (value & 0b10) >> 1; // Extract the second bit
+            let rightIRState = value & 0b01; // Extract the first bit
+
+            let element = document.getElementById("LeftIR");
+            element.innerText = leftIRState ? "DETECTING" : "CLEAR";
+            element.style.color = leftIRState ? "RED" : "GREEN";
+
+            element = document.getElementById("RightIR");
+            element.innerText = rightIRState ? "DETECTING" : "CLEAR";
+            element.style.color = rightIRState ? "RED" : "GREEN";
+        }
     }
 
     const eventSource = new EventSource('/events');
@@ -80,30 +89,13 @@
         document.getElementById("status").innerText = "Connected!";
     });
 
-    eventSource.addEventListener("IRLeft", (event) => {
-        console.log("Left IR: " + event.data);
-        feedLoader("LeftIR", parseInt(event.data), 100);
-    });
-    eventSource.addEventListener("IRRight", (event) => {
-        console.log("Right IR: " + event.data);
-        const x = document.getElementById("stamp");
-        x.innerText = Date.now();
-        feedLoader("RightIR", parseInt(event.data), 100);
-    });
-
-    eventSource.addEventListener("USDown", (event) => {
-        console.log("US Down: " + event.data);
-        feedLoader("USDown", parseInt(event.data), 100);
-    });
-    eventSource.addEventListener("USForward", (event) => {
-        console.log("US Forward: " + event.data);
-        feedLoader("USForward", parseInt(event.data), 100);
-    });
-
-    eventSource.addEventListener("DIRECTION", (event) => {
-        console.log("DIRECTION: " + event.data);
-        feedLoader("DIRECTION", event.data);
-    });
+    eventSource.addEventListener("pulse", (event) => {
+        let json = JSON.parse(event.data);
+        feedLoader("IRData", json.IRData, 100);
+        feedLoader("USData", json.USData, 100);
+        feedLoader("DIRECTION", json.DIRECTION, 0);
+        lastUpdate = Date.now();
+    })
 
     eventSource.onerror = function(error) {
         console.error(error);
