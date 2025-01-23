@@ -83,17 +83,17 @@ void gaLinks(){
     // digitalWrite (EnableR1, HIGH);
     // digitalWrite (EnableR2, HIGH);
     //
-    // //Motor pins vooruit
-    // digitalWrite(MotorInL1V, LOW);
-    // digitalWrite(MotorInL2V, LOW);
-    // digitalWrite(MotorInR1V, HIGH);
-    // digitalWrite(MotorInR2V, HIGH);
-    //
-    // //Motor pins achteruit
-    // digitalWrite(MotorInL1A, HIGH);
-    // digitalWrite(MotorInR1A, HIGH);
-    // digitalWrite(MotorInL2A, LOW);
-    // digitalWrite(MotorInR2A, LOW);
+    //Motor pins vooruit
+    digitalWrite(MotorInL1V, LOW);
+    digitalWrite(MotorInL2V, LOW);
+    digitalWrite(MotorInR1V, HIGH);
+    digitalWrite(MotorInR2V, HIGH);
+    
+    //Motor pins achteruit
+    digitalWrite(MotorInL1A, HIGH);
+    digitalWrite(MotorInR1A, HIGH);
+    digitalWrite(MotorInL2A, LOW);
+    digitalWrite(MotorInR2A, LOW);
 }
 
 void gaRechts(){
@@ -103,17 +103,26 @@ void gaRechts(){
     // digitalWrite (EnableR1, HIGH);
     // digitalWrite (EnableR2, HIGH);
     //
-    // //Motor pins vooruit
-    // digitalWrite(MotorInL1V, HIGH);
-    // digitalWrite(MotorInL2V, HIGH);
-    // digitalWrite(MotorInR1V, LOW);
-    // digitalWrite(MotorInR2V, LOW);
-    //
-    // //Motor pins achteruit
-    // digitalWrite(MotorInL1A, LOW);
-    // digitalWrite(MotorInR1A, LOW);
-    // digitalWrite(MotorInL2A, HIGH);
-    // digitalWrite(MotorInR2A, HIGH);
+    //Motor pins vooruit
+    digitalWrite(MotorInL1V, HIGH);
+    digitalWrite(MotorInL2V, HIGH);
+    digitalWrite(MotorInR1V, LOW);
+    digitalWrite(MotorInR2V, LOW);
+    
+    //Motor pins achteruit
+    digitalWrite(MotorInL1A, LOW);
+    digitalWrite(MotorInR1A, LOW);
+    digitalWrite(MotorInL2A, HIGH);
+    digitalWrite(MotorInR2A, HIGH);
 }
 
 #endif
+
+/*
+Wat moet er nog gebeuren:
+
+- Pins voor de EnablePins moeten bepaald worden;
+- PWM signaal moet bepaald worden op de EnablePins;
+- Toepassen op de main code samen met het algoritme.
+
+*/
