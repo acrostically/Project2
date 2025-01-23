@@ -122,6 +122,8 @@ void setup() {
     Serial.println("Server Sent Events loaded on core 0!");
 
     Serial.println("Starting main loop!\n");
+
+    motorSetup(); // setup van de motor...
 }
 
 void loop() {
@@ -137,7 +139,7 @@ void loop() {
         // if (IRLeftData)
     }
 
-    gaAchteruit();
+    gaVooruit();
     Serial.println("Good luck!");
 }
 

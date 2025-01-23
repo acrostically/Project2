@@ -13,8 +13,8 @@
 #define MotorInR2V 12 //Motor 2 R Voor
 #define MotorInR2A 13 //Motor 2 R Achteruit
 
-// #define EnableL1 1 //Enable Motor 1 L
-// #define EnableL2 2//Enable Motor 2 L
+// #define EnableL1  //Enable Motor 1 L
+// #define EnableL2  //Enable Motor 2 L
 // #define EnableR1  //Enable Motor 1 R
 // #define EnableR2  //Enable Motor 2 R
 
@@ -29,10 +29,10 @@ void motorSetup(){
     pinMode(MotorInR2V, OUTPUT);
     pinMode(MotorInR2A, OUTPUT);
 
-    pinMode(EnableL1, OUTPUT);
-    pinMode(EnableL2, OUTPUT);
-    pinMode(EnableR1, OUTPUT);
-    pinMode(EnableR2, OUTPUT);
+    // pinMode(EnableL1, OUTPUT);
+    // pinMode(EnableL2, OUTPUT);
+    // pinMode(EnableR1, OUTPUT);
+    // pinMode(EnableR2, OUTPUT);
 }
 
 void gaVooruit() {
@@ -48,20 +48,20 @@ void gaVooruit() {
     digitalWrite(MotorInL2V, HIGH);
     digitalWrite(MotorInR1V, HIGH);
     digitalWrite(MotorInR2V, HIGH);
-    //
-    // //Motor pins achteruit
-    // digitalWrite(MotorInL1A, LOW);
-    // digitalWrite(MotorInR1A, LOW);
-    // digitalWrite(MotorInL2A, LOW);
-    // digitalWrite(MotorInR2A, LOW);
+    
+    //Motor pins achteruit
+    digitalWrite(MotorInL1A, LOW);
+    digitalWrite(MotorInR1A, LOW);
+    digitalWrite(MotorInL2A, LOW);
+    digitalWrite(MotorInR2A, LOW);
 }
 
 void gaAchteruit(){
 
-    digitalWrite (EnableL1, HIGH);
-    digitalWrite (EnableL2, HIGH);
-    digitalWrite (EnableR1, HIGH);
-    digitalWrite (EnableR2, HIGH);
+    // digitalWrite (EnableL1, HIGH);
+    // digitalWrite (EnableL2, HIGH);
+    // digitalWrite (EnableR1, HIGH);
+    // digitalWrite (EnableR2, HIGH);
 
     //Motor pins vooruit
     digitalWrite(MotorInL1V, LOW);
