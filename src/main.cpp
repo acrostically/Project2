@@ -42,7 +42,7 @@ TaskHandle_t eventPulseTask;
 SemaphoreHandle_t dataMutex;
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     dataMutex = xSemaphoreCreateMutex();
     if (dataMutex == nullptr) {
@@ -97,6 +97,7 @@ void setup() {
     Serial.println("Server Sent Events loaded on core 0!");
 
     Serial.println("Starting main loop!\n");
+    motorSetup();
 }
 
 unsigned long correctionStartTime = 0;
@@ -111,9 +112,12 @@ void loop() {
     IRData = IRRead();
     xSemaphoreGive(dataMutex);
 
-
     // ALWAYS stop ASAP if we detect something in front of us, DO NOT DELAY this check
-    if ((USData != 0b00 || (IRData & 0b11)) && !forwardDetectCache) {
+    if ((/*USData != 0b00 || */ (IRData & 0b00)) && !forwardDetectCache) {
+        Serial.println("AWDYGWJD");
+        Serial.println("US" + String(USData));
+        Serial.println("IR" + String(IRData));
+        Serial.println("WIYAFWIYGD");
         carDirection = Direction::BACKWARD;
         gaAchteruit();
         forwardDetectCache = true;
@@ -123,6 +127,8 @@ void loop() {
         return;
     }
 
+    // Serial.println("test");
+
     if (isCorrecting) {
         if (millis() - correctionStartTime >= reverseDuration) {
             isCorrecting = false;  // Done reversing, move to correction
@@ -130,6 +136,8 @@ void loop() {
             return;  // Keep reversing until time is up
         }
     }
+
+    Serial.println("test2");
 
     // if we detect something in front of us, we should correct
     if (forwardDetectCache) {
@@ -149,7 +157,10 @@ void loop() {
         isCorrecting = true;
         correctionStartTime = millis();
         forwardDetectCache = false;
+        Serial.println("test3");
     }
+
+
 
     // if we detect something on the left, we should go right
     else if ((IRData & 0b10) && carDirection != Direction::LEFT) {
@@ -157,6 +168,7 @@ void loop() {
         gaRechts();
         isCorrecting = true;
         correctionStartTime = millis();
+        Serial.println("test4");
     }
 
     // if we detect something on the right, we should go left
@@ -165,6 +177,7 @@ void loop() {
         gaLinks();
         isCorrecting = true;
         correctionStartTime = millis();
+        Serial.println("test5");
     }
 
     // if we're not going forward and not detecting anything, we should go forward
@@ -173,6 +186,7 @@ void loop() {
         gaVooruit();
         isCorrecting = true;
         correctionStartTime = millis();
+        Serial.println("test6");
     };
 }
 

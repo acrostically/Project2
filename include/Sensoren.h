@@ -7,7 +7,7 @@
 
 #include <Arduino.h>
 
-int IRLeftPin = 16;
+int IRLeftPin = 2;
 int IRRightPin = 0;
 
 int USForwardEchoPin = 17;
