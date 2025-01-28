@@ -116,6 +116,27 @@ void gaRechts(){
     digitalWrite(MotorInR2A, HIGH);
 }
 
+void stopMotoren(){
+
+    // digitalWrite (EnableL1, HIGH);
+    // digitalWrite (EnableL2, HIGH);
+    // digitalWrite (EnableR1, HIGH);
+    // digitalWrite (EnableR2, HIGH);
+    //
+    //Motor pins vooruit
+    digitalWrite(MotorInL1V, LOW);
+    digitalWrite(MotorInL2V, LOW);
+    digitalWrite(MotorInR1V, LOW);
+    digitalWrite(MotorInR2V, LOW);
+
+    //Motor pins achteruit
+    digitalWrite(MotorInL1A, LOW);
+    digitalWrite(MotorInR1A, LOW);
+    digitalWrite(MotorInL2A, LOW);
+    digitalWrite(MotorInR2A, LOW);
+}
+
+
 #endif
 
 /*
