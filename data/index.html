@@ -39,7 +39,7 @@
 <div style="display:flex; flex-direction: column">
     <div style="display: flex; justify-content: space-around; margin: 0;">
         <p>on/off: <span id="onOrOff">Connecting...</span></p>
-        <p><u>toggle!</u></p>
+        <p><u onclick="toggleAcm()">toggle!</u></p>
     </div>
     <div style="display: flex; justify-content: space-around; margin: 0;">
         <p>Status: <span id="status">Connecting...</span></p>
@@ -60,6 +60,7 @@
     function feedLoader(id, value, trigger) {
         let element = document.getElementById(id);
         if (id === "DIRECTION") {
+            console.log(id, value);
             if (value !== "STOP") {
                 element.innerText = value === "FORWARD" ? "FORWARD" : "BACKWARD";
                 element.style.color = value === "FORWARD" ? "GREEN" : "ORANGE";
@@ -83,6 +84,10 @@
         }
     }
 
+    function toggleAcm() {
+        fetch("./toggle");
+    }
+
     const eventSource = new EventSource('/events');
 
     eventSource.addEventListener("open", (event) => {
@@ -93,7 +98,9 @@
         let json = JSON.parse(event.data);
         feedLoader("IRData", json.IRData, 100);
         feedLoader("USData", json.USData, 100);
-        feedLoader("DIRECTION", json.DIRECTION, 0);
+        feedLoader("DIRECTION", json.Direction, 0);
+
+        console.log(json);
         lastUpdate = Date.now();
     })
 

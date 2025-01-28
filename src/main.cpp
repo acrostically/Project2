@@ -4,6 +4,7 @@
 #include <SPIFFS.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+
 #include "Motor.h"
 #include "Sensoren.h"
 
@@ -12,6 +13,8 @@ const char* AP_SSID = "GROEP_6_PROJECT_2";
 const char* AP_PASSWORD = "KGADW&^54AWDKJ&R^";
 
 constexpr int detectThreshold = 5; // in cm
+
+bool carEnabled = false;
 
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
@@ -71,6 +74,14 @@ void setup() {
         request->send(SPIFFS, "/index.html", String(), false);
     });
 
+    server.on("/toggle", HTTP_GET, [](AsyncWebServerRequest *request) {
+        carEnabled = !carEnabled; // Toggle the value of carEnabled
+        String response = carEnabled ? "true" : "false"; // Convert to string for the response
+        request->send(200, "text/plain", response); // Send the response
+        Serial.print("TOGGLED CAR TO ");
+        Serial.println(carEnabled ? "ON" : "OFF");
+    });
+
     // event handling
     events.onConnect([](const AsyncEventSourceClient *client) {
         if (client->lastId()) {
@@ -107,13 +118,20 @@ bool isCorrecting = false;
 Direction lastCorrection = Direction::RIGHT; // don't know why we load this with right, it just felt... right
 
 void loop() {
+    if (!carEnabled) {
+        if (carDirection != Direction::STOP) {
+            carDirection = Direction::STOP;
+            stopMotoren();
+        }
+    };
+
     xSemaphoreTake(dataMutex, portMAX_DELAY);
     USData = USRead(5);
     IRData = IRRead();
     xSemaphoreGive(dataMutex);
 
     // ALWAYS stop ASAP if we detect something in front of us, DO NOT DELAY this check
-    if ((/*USData != 0b00 || */ (IRData & 0b00)) && !forwardDetectCache) {
+    if ((/*USData != 0b00 || */ (IRData & 0b11)) && !forwardDetectCache) {
         Serial.println("AWDYGWJD");
         Serial.println("US" + String(USData));
         Serial.println("IR" + String(IRData));
@@ -127,8 +145,6 @@ void loop() {
         return;
     }
 
-    // Serial.println("test");
-
     if (isCorrecting) {
         if (millis() - correctionStartTime >= reverseDuration) {
             isCorrecting = false;  // Done reversing, move to correction
@@ -136,8 +152,6 @@ void loop() {
             return;  // Keep reversing until time is up
         }
     }
-
-    Serial.println("test2");
 
     // if we detect something in front of us, we should correct
     if (forwardDetectCache) {
@@ -157,7 +171,6 @@ void loop() {
         isCorrecting = true;
         correctionStartTime = millis();
         forwardDetectCache = false;
-        Serial.println("test3");
     }
 
 
@@ -168,7 +181,6 @@ void loop() {
         gaRechts();
         isCorrecting = true;
         correctionStartTime = millis();
-        Serial.println("test4");
     }
 
     // if we detect something on the right, we should go left
@@ -177,7 +189,6 @@ void loop() {
         gaLinks();
         isCorrecting = true;
         correctionStartTime = millis();
-        Serial.println("test5");
     }
 
     // if we're not going forward and not detecting anything, we should go forward
@@ -186,7 +197,6 @@ void loop() {
         gaVooruit();
         isCorrecting = true;
         correctionStartTime = millis();
-        Serial.println("test6");
     };
 }
 
@@ -200,14 +210,15 @@ void eventPulse() {
             xSemaphoreGive(dataMutex);
 
             String JSON = "{";
-            JSON += "IRData: " + String(localIRData) + ",";
-            JSON += "USData: " + String(localUSData) + ",";
-            JSON += "Direction: " + getMotorDirectionString();
+            JSON += "\"IRData\": " + String(localIRData) + ",";
+            JSON += "\"USData\": " + String(localUSData) + ",";
+            JSON += "\"Direction\": \"" + getMotorDirectionString() + "\"";
             JSON += "}";
 
             events.send(JSON.c_str(), "pulse", millis(), pulseDelay);
             lastPulseMS = millis();
         }
+        vTaskDelay(100);
     }
 }
 

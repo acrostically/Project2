@@ -51,8 +51,8 @@ int USRead(int treshhold) {
 int IRRead() {
   int res = 0b00;
 
-  res |= !digitalRead(IRLeftPin) << 1;
-  res |= !digitalRead(IRRightPin);
+  res |= digitalRead(IRLeftPin) << 1;
+  res |= digitalRead(IRRightPin);
 
   return res;
 };
