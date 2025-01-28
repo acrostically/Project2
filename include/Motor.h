@@ -38,102 +38,106 @@ void motorSetup(){
 void gaVooruit() {
     //
     // //Enable pins
-    // digitalWrite(EnableL1, HIGH);
-    // digitalWrite (EnableL2, HIGH);
-    // digitalWrite (EnableR1, HIGH);
-    // digitalWrite (EnableR2, HIGH);
-    //
+    // analogWrite(EnableL1, 180);
+    // analogWrite (EnableL2, 180);
+    // analogWrite (EnableR1, 180);
+    // analogWrite (EnableR2, 180);
+    
     //Motor pins vooruit
-    digitalWrite(MotorInL1V, HIGH);
-    digitalWrite(MotorInL2V, HIGH);
-    digitalWrite(MotorInR1V, HIGH);
-    digitalWrite(MotorInR2V, HIGH);
+    analogWrite(MotorInL1V, 180);
+    analogWrite(MotorInL2V, 180);
+    analogWrite(MotorInR1V, 180);
+    analogWrite(MotorInR2V, 180);
     
     //Motor pins achteruit
-    digitalWrite(MotorInL1A, LOW);
-    digitalWrite(MotorInR1A, LOW);
-    digitalWrite(MotorInL2A, LOW);
-    digitalWrite(MotorInR2A, LOW);
+    analogWrite(MotorInL1A, LOW);
+    analogWrite(MotorInR1A, LOW);
+    analogWrite(MotorInL2A, LOW);
+    analogWrite(MotorInR2A, LOW);
 }
 
 void gaAchteruit(){
 
-    // digitalWrite (EnableL1, HIGH);
-    // digitalWrite (EnableL2, HIGH);
-    // digitalWrite (EnableR1, HIGH);
-    // digitalWrite (EnableR2, HIGH);
+    // // //Enable pins
+    // analogWrite(EnableL1, 180);
+    // analogWrite (EnableL2, 180);
+    // analogWrite (EnableR1, 180);
+    // analogWrite (EnableR2, 180);
 
     //Motor pins vooruit
-    digitalWrite(MotorInL1V, LOW);
-    digitalWrite(MotorInL2V, LOW);
-    digitalWrite(MotorInR1V, LOW);
-    digitalWrite(MotorInR2V, LOW);
+    analogWrite(MotorInL1V, LOW);
+    analogWrite(MotorInL2V, LOW);
+    analogWrite(MotorInR1V, LOW);
+    analogWrite(MotorInR2V, LOW);
 
     //Motor pins achteruit
-    digitalWrite(MotorInL1A, HIGH);
-    digitalWrite(MotorInR1A, HIGH);
-    digitalWrite(MotorInL2A, HIGH);
-    digitalWrite(MotorInR2A, HIGH);
+    analogWrite(MotorInL1A, 180);
+    analogWrite(MotorInR1A, 180);
+    analogWrite(MotorInL2A, 180);
+    analogWrite(MotorInR2A, 180);
 }
 
 void gaLinks(){
-    //
-    // digitalWrite (EnableL1, HIGH);
-    // digitalWrite (EnableL2, HIGH);
-    // digitalWrite (EnableR1, HIGH);
-    // digitalWrite (EnableR2, HIGH);
-    //
+    // //Enable pins
+    
+    // analogWrite(EnableL1, 180);
+    // analogWrite (EnableL2, 180);
+    // analogWrite (EnableR1, 180);
+    // analogWrite (EnableR2, 180);
+
     //Motor pins vooruit
-    digitalWrite(MotorInL1V, LOW);
-    digitalWrite(MotorInL2V, LOW);
-    digitalWrite(MotorInR1V, HIGH);
-    digitalWrite(MotorInR2V, HIGH);
+    analogWrite(MotorInL1V, LOW);
+    analogWrite(MotorInL2V, LOW);
+    analogWrite(MotorInR1V, 180);
+    analogWrite(MotorInR2V, 180);
     
     //Motor pins achteruit
-    digitalWrite(MotorInL1A, HIGH);
-    digitalWrite(MotorInR1A, HIGH);
-    digitalWrite(MotorInL2A, LOW);
-    digitalWrite(MotorInR2A, LOW);
+    analogWrite(MotorInL1A, 180);
+    analogWrite(MotorInR1A, 180);
+    analogWrite(MotorInL2A, LOW);
+    analogWrite(MotorInR2A, LOW);
 }
 
 void gaRechts(){
 
-    // digitalWrite (EnableL1, HIGH);
-    // digitalWrite (EnableL2, HIGH);
-    // digitalWrite (EnableR1, HIGH);
-    // digitalWrite (EnableR2, HIGH);
-    //
+    // // //Enable pins
+    // analogWrite(EnableL1, 180);
+    // analogWrite (EnableL2, 180);
+    // analogWrite (EnableR1, 180);
+    // analogWrite (EnableR2, 180);
+
     //Motor pins vooruit
-    digitalWrite(MotorInL1V, HIGH);
-    digitalWrite(MotorInL2V, HIGH);
-    digitalWrite(MotorInR1V, LOW);
-    digitalWrite(MotorInR2V, LOW);
+    analogWrite(MotorInL1V, 180);
+    analogWrite(MotorInL2V, 180);
+    analogWrite(MotorInR1V, LOW);
+    analogWrite(MotorInR2V, LOW);
     
     //Motor pins achteruit
-    digitalWrite(MotorInL1A, LOW);
-    digitalWrite(MotorInR1A, LOW);
-    digitalWrite(MotorInL2A, HIGH);
-    digitalWrite(MotorInR2A, HIGH);
+    analogWrite(MotorInL1A, LOW);
+    analogWrite(MotorInR1A, LOW);
+    analogWrite(MotorInL2A, 180);
+    analogWrite(MotorInR2A, 180);
 }
 
 void stopMotoren(){
 
-    // digitalWrite (EnableL1, HIGH);
-    // digitalWrite (EnableL2, HIGH);
-    // digitalWrite (EnableR1, HIGH);
-    // digitalWrite (EnableR2, HIGH);
-    //
+  // //Enable pins
+    // analogWrite(EnableL1, 180);
+    // analogWrite (EnableL2, 180);
+    // analogWrite (EnableR1, 180);
+    // analogWrite (EnableR2, 180);
+    
     //Motor pins vooruit
-    digitalWrite(MotorInL1V, LOW);
-    digitalWrite(MotorInL2V, LOW);
-    digitalWrite(MotorInR1V, LOW);
-    digitalWrite(MotorInR2V, LOW);
+    analogWrite(MotorInL1V, LOW);
+    analogWrite(MotorInL2V, LOW);
+    analogWrite(MotorInR1V, LOW);
+    analogWrite(MotorInR2V, LOW);
 
     //Motor pins achteruit
-    digitalWrite(MotorInL1A, LOW);
-    digitalWrite(MotorInR1A, LOW);
-    digitalWrite(MotorInL2A, LOW);
-    digitalWrite(MotorInR2A, LOW);
+    analogWrite(MotorInL1A, LOW);
+    analogWrite(MotorInR1A, LOW);
+    analogWrite(MotorInL2A, LOW);
+    analogWrite(MotorInR2A, LOW);
 }
 
 
