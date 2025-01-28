@@ -125,6 +125,11 @@ void loop() {
         }
     };
 
+    if (digitalRead(35)) {
+        carDirection = Direction::STOP;
+        stopMotoren();
+    }
+
     xSemaphoreTake(dataMutex, portMAX_DELAY);
     USData = USRead(5);
     IRData = IRRead();
@@ -228,6 +233,10 @@ String getMotorDirectionString() {
             return "FORWARD";
         case Direction::BACKWARD:
             return "BACKWARD";
+        case Direction::LEFT:
+            return "LEFT";
+        case Direction::RIGHT:
+            return "RIGHT";
         case Direction::STOP:
             return "STOP";
         default:
