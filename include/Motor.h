@@ -38,16 +38,16 @@ void motorSetup(){
 void gaVooruit() {
     //
     // //Enable pins
-    // analogWrite(EnableL1, 150);
-    // analogWrite (EnableL2, 150);
-    // analogWrite (EnableR1, 150);
-    // analogWrite (EnableR2, 150);
+    // analogWrite(EnableL1, 170);
+    // analogWrite (EnableL2, 170);
+    // analogWrite (EnableR1, 170);
+    // analogWrite (EnableR2, 170);
     
     //Motor pins vooruit
-    analogWrite(MotorInL1V, 150);
-    analogWrite(MotorInL2V, 150);
-    analogWrite(MotorInR1V, 150);
-    analogWrite(MotorInR2V, 130);
+    analogWrite(MotorInL1V, 190);
+    analogWrite(MotorInL2V, 190);
+    analogWrite(MotorInR1V, 170);
+    analogWrite(MotorInR2V, 170);
     
     //Motor pins achteruit
     analogWrite(MotorInL1A, LOW);
@@ -59,10 +59,10 @@ void gaVooruit() {
 void gaAchteruit(){
 
     // // //Enable pins
-    // analogWrite(EnableL1, 150);
-    // analogWrite (EnableL2, 150);
-    // analogWrite (EnableR1, 150);
-    // analogWrite (EnableR2, 150);
+    // analogWrite(EnableL1, 170);
+    // analogWrite (EnableL2, 170);
+    // analogWrite (EnableR1, 170);
+    // analogWrite (EnableR2, 170);
 
     //Motor pins vooruit
     analogWrite(MotorInL1V, LOW);
@@ -71,29 +71,29 @@ void gaAchteruit(){
     analogWrite(MotorInR2V, LOW);
 
     //Motor pins achteruit
-    analogWrite(MotorInL1A, 150);
-    analogWrite(MotorInR1A, 150);
-    analogWrite(MotorInL2A, 150);
-    analogWrite(MotorInR2A, 150);
+    analogWrite(MotorInL1A, 190);
+    analogWrite(MotorInR1A, 190);
+    analogWrite(MotorInL2A, 170);
+    analogWrite(MotorInR2A, 170);
 }
 
 void gaLinks(){
     // //Enable pins
     
-    // analogWrite(EnableL1, 150);
-    // analogWrite (EnableL2, 150);
-    // analogWrite (EnableR1, 150);
-    // analogWrite (EnableR2, 150);
+    // analogWrite(EnableL1, 170);
+    // analogWrite (EnableL2, 170);
+    // analogWrite (EnableR1, 170);
+    // analogWrite (EnableR2, 170);
 
     //Motor pins vooruit
     analogWrite(MotorInL1V, LOW);
     analogWrite(MotorInL2V, LOW);
-    analogWrite(MotorInR1V, 150);
-    analogWrite(MotorInR2V, 150);
+    analogWrite(MotorInR1V, 170);
+    analogWrite(MotorInR2V, 170);
     
     //Motor pins achteruit
-    analogWrite(MotorInL1A, 150);
-    analogWrite(MotorInR1A, 150);
+    analogWrite(MotorInL1A, 190);
+    analogWrite(MotorInR1A, 190);
     analogWrite(MotorInL2A, LOW);
     analogWrite(MotorInR2A, LOW);
 }
@@ -101,31 +101,31 @@ void gaLinks(){
 void gaRechts(){
 
     // // //Enable pins
-    // analogWrite(EnableL1, 150);
-    // analogWrite (EnableL2, 150);
-    // analogWrite (EnableR1, 150);
-    // analogWrite (EnableR2, 150);
+    // analogWrite(EnableL1, 170);
+    // analogWrite (EnableL2, 170);
+    // analogWrite (EnableR1, 170);
+    // analogWrite (EnableR2, 170);
 
     //Motor pins vooruit
-    analogWrite(MotorInL1V, 150);
-    analogWrite(MotorInL2V, 150);
+    analogWrite(MotorInL1V, 190);
+    analogWrite(MotorInL2V, 190);
     analogWrite(MotorInR1V, LOW);
     analogWrite(MotorInR2V, LOW);
     
     //Motor pins achteruit
     analogWrite(MotorInL1A, LOW);
     analogWrite(MotorInR1A, LOW);
-    analogWrite(MotorInL2A, 150);
-    analogWrite(MotorInR2A, 150);
+    analogWrite(MotorInL2A, 190);
+    analogWrite(MotorInR2A, 190);
 }
 
 void stopMotoren(){
 
   // //Enable pins
-    // analogWrite(EnableL1, 150);
-    // analogWrite (EnableL2, 150);
-    // analogWrite (EnableR1, 150);
-    // analogWrite (EnableR2, 150);
+    // analogWrite(EnableL1, 170);
+    // analogWrite (EnableL2, 170);
+    // analogWrite (EnableR1, 170);
+    // analogWrite (EnableR2, 170);
     
     //Motor pins vooruit
     analogWrite(MotorInL1V, LOW);

@@ -109,7 +109,7 @@ void setup() {
 }
 
 unsigned long correctionStartTime = 0;
-constexpr unsigned long reverseDuration = 500;  // Move backward for 500ms
+constexpr unsigned long reverseDuration = 750;  // Move backward for 1500ms
 bool forwardDetectCache = false;
 bool isCorrecting = false;
 Direction lastCorrection = Direction::RIGHT; // don't know why we load this with right, it just felt... right
@@ -178,15 +178,15 @@ void loop() {
 
 
     // if we detect something on the left, we should go right
-    else if ((IRData & 0b01) && carDirection != Direction::LEFT) {
+    else if ((IRData & 0b10)) {
         carDirection = Direction::RIGHT;
         gaRechts();
         isCorrecting = true;
-        correctionStartTime = millis();
+        correctionStartTime = millis() - 500;
     }
 
     // if we detect something on the right, we should go left
-    else if ((IRData & 0b10) && carDirection != Direction::RIGHT) {
+    else if ((IRData & 0b01)) {
         carDirection = Direction::LEFT;
         gaLinks();
         isCorrecting = true;
