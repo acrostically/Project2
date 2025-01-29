@@ -46,7 +46,7 @@ void gaVooruit() {
     //Motor pins vooruit
     analogWrite(MotorInL1V, 190);
     analogWrite(MotorInL2V, 190);
-    analogWrite(MotorInR1V, 170);
+    analogWrite(MotorInR1V, 190);
     analogWrite(MotorInR2V, 170);
     
     //Motor pins achteruit
@@ -73,7 +73,7 @@ void gaAchteruit(){
     //Motor pins achteruit
     analogWrite(MotorInL1A, 190);
     analogWrite(MotorInR1A, 190);
-    analogWrite(MotorInL2A, 170);
+    analogWrite(MotorInL2A, 190);
     analogWrite(MotorInR2A, 170);
 }
 

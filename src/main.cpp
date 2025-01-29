@@ -30,7 +30,7 @@ Direction carDirection = Direction::STOP;
 
 // event update frequency in MS for UI
 unsigned long lastPulseMS = 0;
-constexpr int pulseDelay = 500;
+constexpr int pulseDelay = 300;
 
 int IRData;
 int USData;
@@ -133,10 +133,13 @@ void loop() {
     IRData = IRRead();
     xSemaphoreGive(dataMutex);
 
+    // Serial.println("US" + String(USData));
+
     // ALWAYS stop ASAP if we detect something in front of us, DO NOT DELAY this check
-    if (((!(USData & 0b10) && IRData == 3) || USData & 0b01) && !forwardDetectCache) {
-        Serial.println("US" + String(USData));
-        Serial.println("IR" + String(IRData));
+    bool usforward = (USData & 0b10) >> 1;
+    bool usdownward = (USData & 0b01);
+
+    if (((!usdownward && IRData == 3) || usforward) && !forwardDetectCache) {
         carDirection = Direction::BACKWARD;
         gaAchteruit();
         forwardDetectCache = true;

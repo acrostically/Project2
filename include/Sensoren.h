@@ -46,7 +46,7 @@ int USRead(int treshhold) {
   int res = 0b00;
 
   int forwardDistance = GetUSDistance(USForwardTriggerPin, USForwardEchoPin);
-  if (forwardDistance < treshhold) {
+  if (forwardDistance < treshhold + 5 && forwardDistance > 0) {
     res |= 0b10;
   }
   int downDistance = GetUSDistance(USDownTriggerPin, USDownEchoPin);
