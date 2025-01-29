@@ -10,10 +10,17 @@
 int IRLeftPin = 2;
 int IRRightPin = 0;
 
-int USForwardEchoPin = 17;
-int USForwardTriggerPin = 5;
-int USDownEchoPin = 19;
-int USDownTriggerPin = 18;
+int USForwardEchoPin = 5;
+int USForwardTriggerPin = 18;
+int USDownEchoPin = 34;
+int USDownTriggerPin = 17;
+
+void setupSensors() {
+  pinMode(USForwardTriggerPin, OUTPUT);
+  pinMode(USForwardEchoPin , INPUT);
+  pinMode(USDownTriggerPin, OUTPUT);
+  pinMode(USDownEchoPin , INPUT);
+}
 
 int GetUSDistance(const int TrigPin, const int EchoPin) {
   // Clears the trigPin
@@ -38,10 +45,12 @@ int GetUSDistance(const int TrigPin, const int EchoPin) {
 int USRead(int treshhold) {
   int res = 0b00;
 
-  if (GetUSDistance(USForwardTriggerPin, USForwardEchoPin) < treshhold) {
+  int forwardDistance = GetUSDistance(USForwardTriggerPin, USForwardEchoPin);
+  if (forwardDistance < treshhold) {
     res |= 0b10;
   }
-  if (GetUSDistance(USDownTriggerPin, USDownEchoPin) < treshhold) {
+  int downDistance = GetUSDistance(USDownTriggerPin, USDownEchoPin);
+  if (downDistance > treshhold) {
     res |= 0b01;
   }
 

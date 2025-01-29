@@ -38,8 +38,7 @@
 <h1>Live Data Stream</h1>
 <div style="display:flex; flex-direction: column">
     <div style="display: flex; justify-content: space-around; margin: 0;">
-        <p>on/off: <span id="onOrOff">Connecting...</span></p>
-        <p><u onclick="toggleAcm()">toggle!</u></p>
+        <p><u onclick="toggleAcm()">toggle on/off!</u></p>
     </div>
     <div style="display: flex; justify-content: space-around; margin: 0;">
         <p>Status: <span id="status">Connecting...</span></p>
@@ -53,10 +52,12 @@
         <p>US Down: <span id="USDown">Loading...</span></p>
         <p>US Forward: <span id="USForward">Loading...</span></p>
     </div>
-    <p>TIMESTAMP: <span id="stamp">Loading...</span></p>
+    <p>Last update: <span id="stamp">Loading...</span> ago</p>
 </div>
 
 <script>
+    let lastUpdate = Date.now();
+
     function feedLoader(id, value, trigger) {
         let element = document.getElementById(id);
         if (id === "DIRECTION") {
@@ -70,9 +71,9 @@
             }
             return;
         }
-        if (id === "IRData") {
-            let leftIRState = (value & 0b10) >> 1; // Extract the second bit
-            let rightIRState = value & 0b01; // Extract the first bit
+        else if (id === "IRData") {
+            let rightIRState = (value & 0b10) >> 1; // Extract the second bit
+            let leftIRState = value & 0b01; // Extract the first bit
 
             let element = document.getElementById("LeftIR");
             element.innerText = leftIRState ? "DETECTING" : "CLEAR";
@@ -81,8 +82,23 @@
             element = document.getElementById("RightIR");
             element.innerText = rightIRState ? "DETECTING" : "CLEAR";
             element.style.color = rightIRState ? "RED" : "GREEN";
+        } else {
+            let USForwardState = (value & 0b10) >> 1; // Extract the second bit
+            let USDownState = value & 0b01; // Extract the first bit
+
+            let element = document.getElementById("USDown");
+            element.innerText = USDownState ? "DETECTING" : "CLEAR";
+            element.style.color = USDownState ? "RED" : "GREEN";
+
+            element = document.getElementById("USForward");
+            element.innerText = USForwardState ? "DETECTING" : "CLEAR";
+            element.style.color = USForwardState ? "RED" : "GREEN";
         }
     }
+
+    setInterval(() => {
+        document.getElementById("stamp").innerText = `${(Date.now() - lastUpdate)/1000}s`;
+    }, 100)
 
     function toggleAcm() {
         fetch("./toggle");
@@ -96,6 +112,7 @@
 
     eventSource.addEventListener("pulse", (event) => {
         let json = JSON.parse(event.data);
+        feedLoader("ON", json.on);
         feedLoader("IRData", json.IRData, 100);
         feedLoader("USData", json.USData, 100);
         feedLoader("DIRECTION", json.Direction, 0);

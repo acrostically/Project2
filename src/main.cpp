@@ -54,10 +54,7 @@ void setup() {
     }
     Serial.println("Mutex created successfully.");
 
-    pinMode(USForwardTriggerPin, OUTPUT);
-    pinMode(USForwardEchoPin , INPUT);
-    pinMode(USDownTriggerPin, OUTPUT);
-    pinMode(USDownEchoPin , INPUT);
+    setupSensors();
 
     if (!SPIFFS.begin()) {
         Serial.println("An error occured while mounting SPIFFS, aborting!");
@@ -128,19 +125,18 @@ void loop() {
     if (digitalRead(35)) {
         carDirection = Direction::STOP;
         stopMotoren();
+        return;
     }
 
     xSemaphoreTake(dataMutex, portMAX_DELAY);
-    USData = USRead(5);
+    USData = USRead(7);
     IRData = IRRead();
     xSemaphoreGive(dataMutex);
 
     // ALWAYS stop ASAP if we detect something in front of us, DO NOT DELAY this check
-    if ((/*USData != 0b00 || */ (IRData & 0b11)) && !forwardDetectCache) {
-        Serial.println("AWDYGWJD");
+    if (((!(USData & 0b10) && IRData == 3) || USData & 0b01) && !forwardDetectCache) {
         Serial.println("US" + String(USData));
         Serial.println("IR" + String(IRData));
-        Serial.println("WIYAFWIYGD");
         carDirection = Direction::BACKWARD;
         gaAchteruit();
         forwardDetectCache = true;
@@ -163,25 +159,26 @@ void loop() {
         switch (lastCorrection) { // we should always correct in the opposite direction we last corrected to prevent getting stuck
             case Direction::LEFT:
                 carDirection = Direction::RIGHT;
+                correctionStartTime = millis() - 500;
                 gaRechts();
                 lastCorrection = Direction::RIGHT;
                 break;
             case Direction::RIGHT:
                 carDirection = Direction::LEFT;
+                correctionStartTime = millis();
                 gaLinks();
                 lastCorrection = Direction::LEFT;
                 break;
             default: break;
         }
         isCorrecting = true;
-        correctionStartTime = millis();
         forwardDetectCache = false;
     }
 
 
 
     // if we detect something on the left, we should go right
-    else if ((IRData & 0b10) && carDirection != Direction::LEFT) {
+    else if ((IRData & 0b01) && carDirection != Direction::LEFT) {
         carDirection = Direction::RIGHT;
         gaRechts();
         isCorrecting = true;
@@ -189,7 +186,7 @@ void loop() {
     }
 
     // if we detect something on the right, we should go left
-    else if ((IRData & 0b01) && carDirection != Direction::RIGHT) {
+    else if ((IRData & 0b10) && carDirection != Direction::RIGHT) {
         carDirection = Direction::LEFT;
         gaLinks();
         isCorrecting = true;
@@ -210,11 +207,13 @@ void eventPulse() {
     for (;;) {
         if (millis() - lastPulseMS >= pulseDelay) {
             xSemaphoreTake(dataMutex, portMAX_DELAY);
+            const bool localCarEnabled = carEnabled;
             const int localIRData = IRData;
             const int localUSData = USData;
             xSemaphoreGive(dataMutex);
 
             String JSON = "{";
+            JSON += "\"ON\": " + String(localCarEnabled) + ",";
             JSON += "\"IRData\": " + String(localIRData) + ",";
             JSON += "\"USData\": " + String(localUSData) + ",";
             JSON += "\"Direction\": \"" + getMotorDirectionString() + "\"";
